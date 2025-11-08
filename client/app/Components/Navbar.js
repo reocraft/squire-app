@@ -34,8 +34,8 @@ export default function Navbar() {
                             <Link href="/">Home</Link>
                         </li>
                         <li>
-                            <button class="bg-black hover:bg-green-300 text-white font-bold py-2 px-4 rounded">
-                                <Link className="button" href="/dashboard">DashBoard</Link>
+                            <button className="bg-black hover:bg-green-300 text-white font-bold py-2 px-4 rounded">
+                                <Link className="button" href="/dashboard">Dashboard</Link>
                             </button>
                         </li>
                     </ul>
