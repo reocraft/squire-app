@@ -9,13 +9,13 @@ export default function Navbar() {
     const [open, setOpen] = useState(false)
 
     return (
-        <nav className="nav">
+        <nav className="nav bg-zinc-50">
             <div className="container h-20">
-                <div>
-                    <Link href="/" className="brand">
-                        {"["} Squire {"]"}
+                <h2 className="homebtn h-full w-20 flex items-center justify-center">
+                    <Link href="/" className="h-full w-full flex items-center justify-center text-[clamp(1vw,1vw,2vw)] font-bold text-green-400 hover:text-green-200 transition-colors">
+                    [ Squire ]
                     </Link>
-                </div>
+                </h2>
 
                 <div>
                     <button
@@ -48,7 +48,7 @@ export default function Navbar() {
 
             <style jsx>{`
                 .nav {
-                    background: #111827;
+                    // background: #111827;
                     color: #fff;
                 }
                 .container {
