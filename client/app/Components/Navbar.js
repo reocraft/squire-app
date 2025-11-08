@@ -9,10 +9,10 @@ export default function Navbar() {
     const [open, setOpen] = useState(false)
 
     return (
-        <nav className="nav bg-zinc-50">
-            <div className="container h-20">
-                <h2 className="homebtn h-full w-20 flex items-center justify-center">
-                    <Link href="/" className="h-full w-full flex items-center justify-center text-[clamp(1vw,1vw,2vw)] font-bold text-green-400 hover:text-green-200 transition-colors">
+        <nav className="nav bg-zinc-50 text-black">
+            <div className="container h-20 justify-between flex">
+                <h2 className="homebtn h-full w-40 flex items-center justify-center">
+                    <Link href="/" className="h-full w-full flex items-center justify-center text-[clamp(2em,2vw,3vw)] font-bold text-green-400 hover:text-green-200 transition-colors">
                     [ Squire ]
                     </Link>
                 </h2>
@@ -49,7 +49,7 @@ export default function Navbar() {
             <style jsx>{`
                 .nav {
                     // background: #111827;
-                    color: #fff;
+                    // color: #fff;
                 }
                 .container {
                     max-width: 1100px;
@@ -87,12 +87,7 @@ export default function Navbar() {
                     margin: 0;
                     padding: 0;
                 }
-                .menu a {
-                    color: #e5e7eb;
-                    text-decoration: none;
-                    padding: 0.5rem 0.75rem;
-                    border-radius: 6px;
-                }
+
                 .menu a:hover {
                     background: rgba(255, 255, 255, 0.06);
                 }
