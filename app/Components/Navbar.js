@@ -10,36 +10,40 @@ export default function Navbar() {
 
     return (
         <nav className="nav">
-            <div className="container">
-                <Link href="/" className="brand">
-                    Squire
-                </Link>
+            <div className="container h-20">
+                <div>
+                    <Link href="/" className="brand">
+                        {"["} Squire {"]"}
+                    </Link>
+                </div>
 
-                <button
-                    className="burger"
-                    aria-label="Toggle menu"
-                    aria-expanded={open}
-                    onClick={() => setOpen((s) => !s)}
-                >
-                    <span />
-                    <span />
-                    <span />
-                </button>
+                <div>
+                    <button
+                        className="burger"
+                        aria-label="Toggle menu"
+                        aria-expanded={open}
+                        onClick={() => setOpen((s) => !s)}
+                    >
+                        <span />
+                        <span />
+                        <span />
+                    </button>
 
-                <ul className={`menu ${open ? 'open' : ''}`}>
-                    <li>
-                        <Link href="/">Home</Link>
-                    </li>
-                    <li>
-                        <Link href="/about">About</Link>
-                    </li>
-                    <li>
-                        <Link href="/services">Services</Link>
-                    </li>
-                    <li>
-                        <Link href="/contact">Contact</Link>
-                    </li>
-                </ul>
+                    <ul className={`menu ${open ? 'open' : ''}`}>
+                        <li>
+                            <Link href="/">Home</Link>
+                        </li>
+                        <li>
+                            <Link href="/about">About</Link>
+                        </li>
+                        <li>
+                            <Link href="/services">Services</Link>
+                        </li>
+                        <li>
+                            <Link href="/contact">Contact</Link>
+                        </li>
+                    </ul>
+                </div>
             </div>
 
             <style jsx>{`
