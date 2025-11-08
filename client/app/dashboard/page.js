@@ -1,9 +1,23 @@
 'use client'
+import { useState } from "react";
 import Image from "next/image";
 import SearchBar from "../Components/Searchbar";
 import BoxButton from "../Components/BoxButton";
+import SearchResult from "../Components/SearchResult";
 
 export default function Home() {
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [resultText, setResultText] = useState("");
+  const [showResult, setShowResult] = useState(false);
+
+  // Function to handle search
+  const handleSearch = (query) => {
+    if (!query.trim()) return;
+    setResultText(`You searched for: "${query}"`);
+    setShowResult(true);
+  };
+
   return (
     <div className="min-h-screen font-sans dark:bg-light bg-gray-50">
       <main
@@ -27,10 +41,20 @@ export default function Home() {
           Hello User 👋
         </h1>
 
-        {/* Search bar - responsive width */}
-        <div className="w-full">
-          <SearchBar />
+        {/* Search bar */}
+        <div className="w-full flex flex-col gap-4">
+          <SearchBar
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onSearch={() => handleSearch(searchQuery)}
+          />
+
+          {/* Search result component (stays on the page) */}
+          {showResult && (
+            <SearchResult text={resultText} />
+          )}
         </div>
+
 
         {/* Button boxes */}
         <div

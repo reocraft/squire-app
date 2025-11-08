@@ -1,29 +1,23 @@
 'use client'
-import { useState } from 'react';
+import React from "react";
 
-export default function SearchBar() {
-  const [query, setQuery] = useState('');
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    console.log('Searching for:', query);
-  };
-
+export default function SearchBar({ value, onChange, onSearch }) {
   return (
-    <form onSubmit={handleSearch} className="flex items-center space-x-2">
+    <div className="flex w-full">
       <input
         type="text"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Ask us anything!"
-        className="w-[90%] h-12 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400 max-sm:h-10 max-sm:text-sm"
+        value={value}
+        onChange={onChange}
+        onKeyDown={(e) => e.key === "Enter" && onSearch()}
+        placeholder="🔍 Ask us anything..."
+        className="flex-1 border rounded-l-full px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-400"
       />
       <button
-        type="submit"
-        className="px-4 py-3 bg-gray-400 text-white rounded-full hover:bg-gray-500 max-sm:px-3 max-sm:py-2"
+        onClick={onSearch}
+        className="bg-green-500 text-white px-4 py-2 rounded-r-full hover:bg-green-600"
       >
         🔍
       </button>
-    </form>
+    </div>
   );
 }
