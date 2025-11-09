@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useReducer } from "react";
 import Image from "next/image";
 import SearchBar from "../Components/Searchbar";
 import BoxButton from "../Components/BoxButton";
@@ -9,15 +9,27 @@ import ScrollBox from "../Components/ScrollBox";
 import Piechart from "../Components/Piechart";
 import Link from "next/link";
 
+import { useRouter } from "next/navigation";
+
+
+
 
 export default function Home() {
   const [userData, setUserData] = useState({})
+  const [genRecipe, setGenRecipe] = useState(false);
+  const [, forceUpdate] = useReducer(updater, 0)
 
+  const router = useRouter();
+
+
+  function updater(state) {
+    return state + 1;
+  }
 
   useEffect(() => {
-    const payload = { userId: "690fc7733d3f4948a7d89600" };
+    const payload = { userId: "6910899638cf892feabd5b04", count:1 };
 
-    fetch("https://squire-app.onrender.com/users/get-user", {
+    fetch("https://squire-app.onrender.com/meals/get-meals", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -25,7 +37,18 @@ export default function Home() {
       .then(res => res.json())
       .then(data => {
         setUserData(data);
+        let totalCals = 50
+        let totalProtein = 0  
+        let totalCarbs = 0
+        let totalFats = 0
+        data.meals.forEach(meal => {
+          totalCals += meal.totalCalories;
+          totalProtein += meal.totalProtein;
+          totalFats += meal.totalFats;
+          totalCarbs += meal.totalCarbs;
+        })
 
+        console.log(totalCals, totalProtein, totalCarbs, totalFats)
         // initialize daily goals from fetched data
         setDailyCalories(data.targetCalories || 2500);
         setDailyProteins(data.targetProtein || 150);
@@ -33,13 +56,13 @@ export default function Home() {
         setDailyFats(data.targetFat || 40);
 
         // initialize remaining macros from fetched data
-        setRemainingCalories(data.remainingCalories ?? data.targetCalories ?? 2500);
-        setRemainingProteins(data.remainingProtein ?? data.targetProtein ?? 150);
-        setRemainingCarbs(data.remainingCarbs ?? data.targetCarbs ?? 250);
-        setRemainingFats(data.remainingFats ?? data.targetFat ?? 40);
+        setRemainingCalories(data.targetCalories - totalCals);
+        setRemainingProteins(data.targetProtein - totalProtein);
+        setRemainingCarbs(data.targetCarbs - totalCarbs);
+        setRemainingFats(data.targetFat - totalFats);
       })
       .catch(err => console.error(err));
-  }, []);
+  }, [userData]);
 
 
 
@@ -84,18 +107,38 @@ export default function Home() {
 
 
 
-  const handleSearch = (query) => {
+  const handleSearch = async (query) => {
     if (!query.trim()) return;
 
-    if (query.toLowerCase().includes("chicken")) {
-      setCurrentRecipe(recipeData);
-      setResultText(formatRecipe(recipeData));
-      setShowResult(true);
-    } else {
-      setCurrentRecipe(null);
-      setResultText(`No matching recipe found for "${query}"`);
-      setShowResult(true);
-    }
+    fetch("http://localhost:8000/recipes/suggest-meal", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: userData._id, query: query }),
+    })
+      .then(res => {
+        // --- 1. CRITICAL: Check the response status ---
+        if (!res.ok) {
+          // If the status is NOT 200, parse the body for the error message
+          return res.json().then(error => {
+            throw new Error(error.message || `HTTP Error: ${res.status}`);
+          });
+        }
+        // If status IS OK, return the parsed JSON
+        return res.json();
+      })
+      .then(data => {
+        // --- 2. SUCCESS ---
+        setResultText(formatRecipe(data));
+        setCurrentRecipe(data);
+        setShowResult(true);
+      })
+      .catch(error => {
+        // --- 3. ERROR HANDLER ---
+        console.error("Recipe suggestion failed:", error);
+        setResultText(`Failed to get recipe: ${error.message}`);
+        setCurrentRecipe(null);
+        setShowResult(true);
+      });
   };
 
 
@@ -104,7 +147,7 @@ export default function Home() {
   const [dailyProteins, setDailyProteins] = useState(150);
   const [dailyCarbs, setDailyCarbs] = useState(250);
   const [dailyFats, setDailyFats] = useState(40);
-  const [userId, setUserId] = useState("690fc7733d3f4948a7d89600");
+  const [userId, setUserId] = useState("69107e6f9c503029b94e791a");
 
   // Setting these daily values to user data fetched.
   useEffect(() => {
@@ -140,27 +183,27 @@ export default function Home() {
   const [remainingCarbs, setRemainingCarbs] = useState(dailyCarbs);
   const [remainingFats, setRemainingFats] = useState(dailyFats);
 
-  // Setting remaining data to upddate to fetched user data.
-  useEffect(() => {
-    if (userData && userData.remainingCalories) {
-      setRemainingCalories(userData.remainingCalories)
-    }
-  }, [userData]);
-  useEffect(() => {
-    if (userData && userData.remainingProtein) {
-      setRemainingProteins(userData.remainingProteins)
-    }
-  }, [userData]);
-  useEffect(() => {
-    if (userData && userData.remainingCarbs) {
-      setRemainingCarbs(userData.remainingCarbs)
-    }
-  }, [userData]);
-  useEffect(() => {
-    if (userData && userData.remainingFat) {
-      setRemainingFats(userData.remainingFats)
-    }
-  }, [userData]);
+  // // Setting remaining data to upddate to fetched user data.
+  // useEffect(() => {
+  //   if (userData && userData.remainingCalories) {
+  //     setRemainingCalories(userData.remainingCalories)
+  //   }
+  // }, [userData]);
+  // useEffect(() => {
+  //   if (userData && userData.remainingProtein) {
+  //     setRemainingProteins(userData.remainingProteins)
+  //   }
+  // }, [userData]);
+  // useEffect(() => {
+  //   if (userData && userData.remainingCarbs) {
+  //     setRemainingCarbs(userData.remainingCarbs)
+  //   }
+  // }, [userData]);
+  // useEffect(() => {
+  //   if (userData && userData.remainingFat) {
+  //     setRemainingFats(userData.remainingFats)
+  //   }
+  // }, [userData]);
 
   // useEffect(() => {
   //   setRemainingCalories(dailyCalories);
@@ -177,6 +220,8 @@ export default function Home() {
 
   const addRecipeToDailyIntake = async () => {
     if (!currentRecipe) return;
+
+
 
     // Step 1: Calculate new remaining macros
     const newRemainingCalories = Math.max(remainingCalories - currentRecipe.totalCalories, 0);
@@ -237,11 +282,12 @@ export default function Home() {
 
   const [mealLogId, setMealLogId] = useState(null);
 
-  async function logMeal() {
+  const logMeal = useCallback(async () => {
     if (!currentRecipe || !userId) return;
 
     try {
       let logId = mealLogId;
+
 
       // Step 1: Fetch the latest meal log for the user
       if (!logId) {
@@ -297,11 +343,25 @@ export default function Home() {
 
       const updatedLog = await resAdd.json();
       console.log("✅ Meal added:", updatedLog);
+      setUserId(userId); // ensure userId is set
+      setGenRecipe(true);
 
     } catch (err) {
       console.error("❌ Error logging meal:", err);
     }
-  }
+  });
+
+  useEffect(() => {
+    if (!genRecipe) {
+      logMeal();
+      
+      // Reload the current page;
+    } else {
+      console.log(genRecipe);
+      window.location.reload()
+    }
+
+  }, [genRecipe])
 
   // async function updateDailyMacrosOnBackend(updatedMacros) {
   //   try {
@@ -352,7 +412,7 @@ export default function Home() {
             font-semibold
           "
             >
-              Hello, {userData.name} 👋
+              Hello, {userData.preferred_name || userData.name} 👋
             </h1>
             <div className="mt-30 max-lg:mt-3 max-lg:mb-3">
               <SearchBar
@@ -402,7 +462,7 @@ export default function Home() {
               <button
                 className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
                 onClick={async () => {
-                  await addRecipeToDailyIntake(); // update macros
+                  // await addRecipeToDailyIntake(); // update macros
                   logMeal(); // log meal separately
                 }}
               >
