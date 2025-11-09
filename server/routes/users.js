@@ -34,23 +34,16 @@ router.post('/create', async (req, res) => {
 });
 
 /* GET users listing. */
-router.post('/get-user', function (req, res, next) {
+router.post('/get-user', async(req, res) => {
   const userId = req.body.userId;
   try {
-    User.findById(userId, (err, user) => {
-      if (err) {
-        return res.status(500).json({ message: err.message });
-      }
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-      res.json(user);
-    });
+    const foundUser = await User.findById(userId);
+
+    res.json(foundUser);
   } catch (err) {
   // Handle validation or database errors
   res.status(400).json({ message: err.message });
-}
-
+  }
 });
 
 module.exports = router;
