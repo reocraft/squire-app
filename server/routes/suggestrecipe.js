@@ -84,7 +84,7 @@ const User = require('../models/user');
 const Ingredient = require("../models/ingredient");
 
 router.post('/suggest-meal', async (req, res) => {
-    const { userId, remainingMacros, userRequest } = req.body;
+    const { userId, remainingMacros, query } = req.body;
     
     // 1. Fetch data from your database (MOCK FOR HACKATHON)
     // Replace this with a real MongoDB query in your final hackathon version
@@ -111,7 +111,7 @@ router.post('/suggest-meal', async (req, res) => {
         User has remaining macros: ${JSON.stringify(remainingMacros)}.
         User has ingredients: ${availableIngredients.join(', ')}.
         User preference: ${foundUser.foodPreference}.
-        User request: "${userRequest}".
+        User request: "${query}".
         You are the user's AI nutrition planner agent. The user wants to eat a healthy meal according to his macronutrient goals,
         provide the best recipe to them, also including nutritional information and a short snippet
         of how it would fit their health goals. 

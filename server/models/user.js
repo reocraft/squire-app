@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
-    preferred_name: { type: String, default: "User", required: true },
+    preferred_name: { type: String, default: "User", required: false },
     name: { type: String, default: "John Doe", required: true },
     // Calculated Targets (The goal for the entire day)
     targetCalories: { type: Number, required: true },

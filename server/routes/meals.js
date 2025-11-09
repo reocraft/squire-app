@@ -1,13 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-const MealLog = require("../models/MealLog");
+const MealLog = require("../models/mealLog");
 
 const ObjectId = mongoose.Types.ObjectId;
 
-// ------------------------------
-// Create a new meal log
-// ------------------------------
+
 router.post("/create", async (req, res) => {
   try {
     const { userId } = req.body;
