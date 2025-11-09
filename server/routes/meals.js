@@ -1,13 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-const MealLog = require("../models/MealLog");
+const MealLog = require("../models/mealLog");
 
 const ObjectId = mongoose.Types.ObjectId;
 
-// ------------------------------
-// Create a new meal log
-// ------------------------------
+
 router.post("/create", async (req, res) => {
   try {
     const { userId } = req.body;
@@ -79,24 +77,24 @@ router.post("/del-meal", async (req, res) => {
 // ------------------------------
 // Fetch recent meal logs
 // ------------------------------
-router.post("/get-meals", async (req, res) => {
-  try {
-    const { userId, count } = req.body;
+// router.post("/get-meals", async (req, res) => {
+//   try {
+//     const { userId, count } = req.body;
 
-    if (!userId) return res.status(400).json({ error: "Missing userId" });
+//     if (!userId) return res.status(400).json({ error: "Missing userId" });
 
-    const limit = count || 7;
+//     const limit = count || 7;
 
-    const mealLogs = await MealLog.find({ userId })
-      .sort({ createdAt: -1 })
-      .limit(limit);
+//     const mealLogs = await MealLog.find({ userId })
+//       .sort({ createdAt: -1 })
+//       .limit(limit);
 
-    res.status(200).json({ mealLogs });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
-  }
-});
+//     res.status(200).json({ mealLogs });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: "Server error" });
+//   }
+// });
 
 // ------------------------------
 // Test route
