@@ -1,13 +1,35 @@
 'use client'
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import SearchBar from "../Components/Searchbar";
 import BoxButton from "../Components/BoxButton";
 import SearchResult from "../Components/SearchResult";
 import { formatRecipe } from "../Components/formatRecipe";
+import ScrollBox from "../Components/ScrollBox";
+import Piechart from "../Components/Piechart";
 
 
 export default function Home() {
+  const [userData, setUserData] = useState({});
+
+  useEffect(() => {
+    const payload = { "userId": "690fc7733d3f4948a7d89600" }
+
+    fetch("https://squire-app.onrender.com/users/get-user", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    })
+      .then(res => res.json())
+      .then(data => setUserData(data))
+      .catch(err => console.error(err));
+
+
+  }, []);
+
+
 
   const recipeData = {
     "recipeName": "Asian-Inspired Chicken & Broccoli Stir-fry",
@@ -47,16 +69,16 @@ export default function Home() {
   const [showResult, setShowResult] = useState(false);
   const [currentRecipe, setCurrentRecipe] = useState(null);
 
-  
+
 
   // Daily goals (placeholder values)
   const dailyCalories = 2000;
-  const dailyProteins = 100;
+  const dailyProteins = 150;
   const dailyCarbs = 250;
-  const dailyFats = 60;
+  const dailyFats = 40;
   const id = 123456;
-  
-  
+
+
 
   // State for remaining macros
   const [remainingCalories, setRemainingCalories] = useState(dailyCalories);
@@ -66,7 +88,7 @@ export default function Home() {
 
   const [userId, setUserId] = useState(id);
 
-  
+
 
   const handleSearch = (query) => {
     if (!query.trim()) return;
@@ -91,7 +113,29 @@ export default function Home() {
     setRemainingFat(prev => Math.max(prev - currentRecipe.fatGrams, 0));
   };
 
-  
+  const calorieData = [
+    { name: ' kcal' },
+    { name: 'Consumed', value: dailyCalories - remainingCalories },
+    { name: 'Remaining', value: remainingCalories },
+  ];
+  const proteinData = [
+    { name: 'g Protein' },
+    { name: 'Consumed', value: dailyProteins - remainingProteins },
+    { name: 'Remaining', value: remainingProteins },
+  ];
+  const carbData = [
+    { name: 'g Carbs' },
+    { name: 'Consumed', value: dailyCarbs - remainingCarbs },
+    { name: 'Remaining', value: remainingCarbs },
+  ];
+  const fatData = [
+    { name: 'g Fats' },
+    { name: 'Consumed', value: dailyFats - remainingFats },
+    { name: 'Remaining', value: remainingFats },
+  ];
+
+
+
 
   return (
     <div className="min-h-screen font-sans dark:bg-light bg-white">
@@ -105,31 +149,67 @@ export default function Home() {
           space-y-10
         "
       >
-        {/* Top-left heading */}
-        <h1
-          className="
+
+        {/* Search and Charts Side by Side */}
+        <div className="flex flex-col md:flex-row w-full gap-8 items-start">
+          {/* Left: Hello name and search bar */}
+          <div className="flex flex-col gap-4 md:w-1/2 w-full">
+            <h1
+              className="
             text-black
             text-[clamp(1.8rem,4vw,3rem)]
             font-semibold
           "
-        >
-          Hello User 👋
-        </h1>
+            >
+              Hello, {userData.name} 👋
+            </h1>
+            <div className="mt-30 max-lg:mt-3 max-lg:mb-3">
+              <SearchBar
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onSearch={() => handleSearch(searchQuery)}
+              />
+            </div>
 
-        {/* Search bar */}
-        <div className="w-full flex flex-col gap-4">
-          <SearchBar
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onSearch={() => handleSearch(searchQuery)}
-          />
 
-          {/* Search result + add to daily intake button */}
+          </div>
+
+          {/* Right: Pie Charts */}
+          <div className="bg-gray-100 p-4 rounded-lg md:w-1/2 w-full">
+            <h2 className="font-semibold mb-4">Remaining Daily Macros</h2>
+
+            {/* Layout for charts */}
+            <div className="flex flex-col lg:flex-row items-center justify-center gap-6 pb-20">
+              {/* Left - Big Calorie Chart */}
+              <div className="flex-1 flex justify-center">
+                <div className="w-64 h-64">
+                  <Piechart data={calorieData} font={1.4} inner={85} outer={125} color={['#a3a3a3', '#22c55e']} />
+                </div>
+              </div>
+
+              {/* Right - Smaller stacked charts */}
+              <div className="flex flex-col gap-0 items-center justify-center max-lg:flex-row">
+                <div className="w-32 h-32">
+                  <Piechart data={proteinData} font={0.65} color={['#c3c3c3', '#26f7fd']} />
+                </div>
+                <div className="w-32 h-32">
+                  <Piechart data={carbData} font={0.7} color={['#c3c3c3', '#f8ff26ff']} />
+                </div>
+                <div className="w-32 h-32">
+                  <Piechart data={fatData} font={0.7} color={['#c3c3c3', '#ff4c4cff']} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Result of search bar */}
+        <div>
           {showResult && currentRecipe && (
-            <div className="flex flex-col gap-2 w-full">
+            <div className="flex flex-col gap-2 items-center w-full">
               <SearchResult text={resultText} />
               <button
-                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 w-max"
+                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
                 onClick={addRecipeToDailyIntake}
               >
                 Add to Daily Intake
@@ -137,22 +217,12 @@ export default function Home() {
             </div>
           )}
 
-          {/* If no recipe found */}
           {showResult && !currentRecipe && (
             <SearchResult text={resultText} />
           )}
         </div>
 
-         {/* Remaining daily macros */}
-        <div className="bg-gray-100 p-4 rounded-lg w-full">
-          <h2 className="font-semibold mb-2">Remaining Daily Macros</h2>
-          <p>Calories: {remainingCalories} kcal</p>
-          <p>Protein: {remainingProteins} g</p>
-          <p>Carbs: {remainingCarbs} g</p>
-          <p>Fat: {remainingFats} g</p>
-        </div>
-
-
+        <ScrollBox userId={userId} />
         {/* Button boxes */}
         <div
           className="
@@ -178,6 +248,7 @@ export default function Home() {
             onClick={() => console.log('Settings clicked!')}
           />
         </div>
+
       </main>
     </div>
   );

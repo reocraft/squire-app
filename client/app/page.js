@@ -1,6 +1,5 @@
-'use client';
 
-import { Children, useState } from 'react';
+import { Children } from 'react';
 import Navbar from './Components/Navbar';
 import ThreeColumnSection from './Components/ThreeColumnSection';
 

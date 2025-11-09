@@ -16,7 +16,7 @@ export default function SearchResult({ text }) {
         whitespace-pre-wrap
       "
     >
-      <p className="text-gray-800 dark:text-gray-200">{text}</p>
+      <div className="text-gray-800 dark:text-gray-200">{text}</div>
     </div>
   );
 }
