@@ -1,6 +1,6 @@
 'use client'; 
-
-// import KnotapiJS from 'knotapi-js';
+import dynamic from 'next/dynamic';
+import KnotapiJS from 'knotapi-js';
 import React, { useState, useEffect } from 'react';
 // import KnotapiJS  from 'knotapi-js';
 
@@ -18,6 +18,7 @@ const getKnotSessionId = async (userId) => {
     });
     if (!response.ok) throw new Error('Failed to create Knot session ID.');
     const data = await response.json(); 
+    console.log(data)
     return data.session;
 };
 
@@ -58,8 +59,7 @@ export default function KnotLinkPage() {
             // STEP 1: Get Session ID from Express Backend
             const sessionId = await getKnotSessionId(MOCK_USER_ID);
 
-            // STEP 2: Initialize and Open the Widget
-            KnotapiJS = window.KnotapiJS.default;
+            // STEP 2: Initialize and Open the Widget;
             const knotapi = new KnotapiJS();
             
             knotapi.open({
@@ -67,7 +67,7 @@ export default function KnotLinkPage() {
                 clientId: process.env.NEXT_PUBLIC_KNOT_CLIENT_ID, 
                 environment: 'development', 
                 product: 'transaction_link', 
-                
+                merchantIds: [36], // Empty array means all merchants
                 // STEP 3: Handle Success - Public Token Received
                 onSuccess: async (publicToken) => {
                     setStatus('exchanging');
@@ -103,7 +103,7 @@ export default function KnotLinkPage() {
     // --- RENDER ---
     return (
         <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50">
-            <script src="https://unpkg.com/knotapi-js@next"></script>
+            
             <div className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md">
                 <h1 className="text-3xl font-bold mb-6 text-center">
                     Link Merchant Accounts 🛒

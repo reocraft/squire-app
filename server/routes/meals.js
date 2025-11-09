@@ -97,6 +97,22 @@ router.post('/get-meals', async(req,res) => {
     }
 })
 
+// router.post('/update-macros', async(req,res) => {
+//     try {
+//         const { userId, macros } = req.body;
+        
+//         const mealLogs = await MealLog.find({ userId: userId })
+//             .sort({ createdAt: -1 })
+//             .limit(mealLogNum);
+            
+//         res.status(200).json({mealLogs: mealLogs});
+
+//     } catch (err) {
+//         // Handle errors
+//         res.status(400).json({ message: err.message });
+//     }
+// })
+
 /* GET users listing. */
 router.get('/user', function (req, res, next) {
     res.send('respond with a resource');
