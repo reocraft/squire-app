@@ -187,7 +187,7 @@ export default function Home() {
   </div>
 
   {/* Right: Charts */}
-<div className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg md:w-1/2 w-full">
+<div className="bg-gray-100 p-4 rounded-lg md:w-1/2 w-full">
   <h2 className="font-semibold mb-4">Remaining Daily Macros</h2>
 
   {/* Layout for charts */}
