@@ -7,26 +7,38 @@ import SearchResult from "../Components/SearchResult";
 import { formatRecipe } from "../Components/formatRecipe";
 import ScrollBox from "../Components/ScrollBox";
 import Piechart from "../Components/Piechart";
+import Link from "next/link";
 
 
 export default function Home() {
-  const [userData, setUserData] = useState({});
+  const [userData, setUserData] = useState({})
+
 
   useEffect(() => {
-    const payload = { "userId": "690fc7733d3f4948a7d89600" }
+    const payload = { userId: "690fc7733d3f4948a7d89600" };
 
     fetch("https://squire-app.onrender.com/users/get-user", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
     })
       .then(res => res.json())
-      .then(data => setUserData(data))
+      .then(data => {
+        setUserData(data);
+
+        // initialize daily goals from fetched data
+        setDailyCalories(data.targetCalories || 2500);
+        setDailyProteins(data.targetProtein || 150);
+        setDailyCarbs(data.targetCarbs || 250);
+        setDailyFats(data.targetFat || 40);
+
+        // initialize remaining macros from fetched data
+        setRemainingCalories(data.remainingCalories ?? data.targetCalories ?? 2500);
+        setRemainingProteins(data.remainingProtein ?? data.targetProtein ?? 150);
+        setRemainingCarbs(data.remainingCarbs ?? data.targetCarbs ?? 250);
+        setRemainingFats(data.remainingFats ?? data.targetFat ?? 40);
+      })
       .catch(err => console.error(err));
-
-
   }, []);
 
 
@@ -71,24 +83,6 @@ export default function Home() {
 
 
 
-  // Daily goals (placeholder values)
-  const dailyCalories = 2000;
-  const dailyProteins = 150;
-  const dailyCarbs = 250;
-  const dailyFats = 40;
-  const id = 123456;
-
-
-
-  // State for remaining macros
-  const [remainingCalories, setRemainingCalories] = useState(dailyCalories);
-  const [remainingProteins, setRemainingProtein] = useState(dailyProteins);
-  const [remainingCarbs, setRemainingCarbs] = useState(dailyCarbs);
-  const [remainingFats, setRemainingFat] = useState(dailyFats);
-
-  const [userId, setUserId] = useState(id);
-
-
 
   const handleSearch = (query) => {
     if (!query.trim()) return;
@@ -104,14 +98,121 @@ export default function Home() {
     }
   };
 
-  const addRecipeToDailyIntake = () => {
+
+  // Daily goals (placeholder values)
+  const [dailyCalories, setDailyCalories] = useState(2500);
+  const [dailyProteins, setDailyProteins] = useState(150);
+  const [dailyCarbs, setDailyCarbs] = useState(250);
+  const [dailyFats, setDailyFats] = useState(40);
+  const [userId, setUserId] = useState("690fc7733d3f4948a7d89600");
+
+  // Setting these daily values to user data fetched.
+  useEffect(() => {
+    if (userData && userData.targetCalories) {
+      setDailyCalories(userData.targetCalories)
+    }
+  }, [userData])
+  useEffect(() => {
+    if (userData && userData.targetProtein) {
+      setDailyProteins(userData.targetProtein)
+    }
+  }, [userData])
+  useEffect(() => {
+    if (userData && userData.targetCarbs) {
+      setDailyCarbs(userData.targetCarbs)
+    }
+  }, [userData])
+  useEffect(() => {
+    if (userData && userData.targetFat) {
+      setDailyFats(userData.targetFat)
+    }
+  }, [userData])
+  // useEffect(() => {
+  //   if (userData && userData.userId) {
+  //     setUserId(userData.userId)
+  //   }
+  // }, [userData])
+
+
+  // State for remaining macros
+  const [remainingCalories, setRemainingCalories] = useState(dailyCalories);
+  const [remainingProteins, setRemainingProteins] = useState(dailyProteins);
+  const [remainingCarbs, setRemainingCarbs] = useState(dailyCarbs);
+  const [remainingFats, setRemainingFats] = useState(dailyFats);
+
+  // Setting remaining data to upddate to fetched user data.
+  useEffect(() => {
+    if (userData && userData.remainingCalories) {
+      setRemainingCalories(userData.remainingCalories)
+    }
+  }, [userData]);
+  useEffect(() => {
+    if (userData && userData.remainingProtein) {
+      setRemainingProteins(userData.remainingProteins)
+    }
+  }, [userData]);
+  useEffect(() => {
+    if (userData && userData.remainingCarbs) {
+      setRemainingCarbs(userData.remainingCarbs)
+    }
+  }, [userData]);
+  useEffect(() => {
+    if (userData && userData.remainingFat) {
+      setRemainingFats(userData.remainingFats)
+    }
+  }, [userData]);
+
+  // useEffect(() => {
+  //   setRemainingCalories(dailyCalories);
+  // }, [dailyCalories]);
+  // useEffect(() => {
+  //   setRemainingProteins(dailyProteins);
+  // }, [dailyProteins]);
+  // useEffect(() => {
+  //   setRemainingCarbs(dailyCarbs);
+  // }, [dailyCarbs]);
+  // useEffect(() => {
+  //   setRemainingFats(dailyFats);
+  // }, [dailyFats]);
+
+  const addRecipeToDailyIntake = async () => {
     if (!currentRecipe) return;
 
-    setRemainingCalories(prev => Math.max(prev - currentRecipe.totalCalories, 0));
-    setRemainingProtein(prev => Math.max(prev - currentRecipe.proteinGrams, 0));
-    setRemainingCarbs(prev => Math.max(prev - currentRecipe.carbGrams, 0));
-    setRemainingFat(prev => Math.max(prev - currentRecipe.fatGrams, 0));
+    // Step 1: Calculate new remaining macros
+    const newRemainingCalories = Math.max(remainingCalories - currentRecipe.totalCalories, 0);
+    const newRemainingProteins = Math.max(remainingProteins - currentRecipe.proteinGrams, 0);
+    const newRemainingCarbs = Math.max(remainingCarbs - currentRecipe.carbGrams, 0);
+    const newRemainingFats = Math.max(remainingFats - currentRecipe.fatGrams, 0);
+
+    // Step 2: Update state
+    setRemainingCalories(newRemainingCalories);
+    setRemainingProteins(newRemainingProteins);
+    setRemainingCarbs(newRemainingCarbs);
+    setRemainingFats(newRemainingFats);
+
+    // Step 3: Send updated macros to backend
+    try {
+      const response = await fetch("https://squire-app.onrender.com/users/update-macros", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId,
+          remainingCalories: newRemainingCalories,
+          remainingProteins: newRemainingProteins,
+          remainingCarbs: newRemainingCarbs,
+          remainingFats: newRemainingFats
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to update macros on backend");
+
+      const data = await response.json();
+      console.log("✅ Updated macros on backend:", data);
+    } catch (err) {
+      console.error("❌ Error updating macros:", err);
+    }
   };
+
 
   const calorieData = [
     { name: ' kcal' },
@@ -133,6 +234,96 @@ export default function Home() {
     { name: 'Consumed', value: dailyFats - remainingFats },
     { name: 'Remaining', value: remainingFats },
   ];
+
+  const [mealLogId, setMealLogId] = useState(null);
+
+  async function logMeal() {
+    if (!currentRecipe || !userId) return;
+
+    try {
+      let logId = mealLogId;
+
+      // Step 1: Fetch the latest meal log for the user
+      if (!logId) {
+        const resGet = await fetch("https://squire-app.onrender.com/meals/get-meals", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId, count: 1 }), // get latest meal log
+        });
+
+        const { mealLogs } = await resGet.json();
+        const latestLog = mealLogs && mealLogs.length > 0 ? mealLogs[0] : null;
+
+        const today = new Date();
+        const isSameDay = latestLog
+          ? new Date(latestLog.createdAt).toDateString() === today.toDateString()
+          : false;
+
+        if (latestLog && isSameDay) {
+          logId = latestLog._id; // use existing meal log
+        } else {
+          // create a new meal log
+          const resCreate = await fetch("https://squire-app.onrender.com/meals/create", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId }),
+          });
+
+          const createData = await resCreate.json();
+          logId = createData._id;
+        }
+
+        setMealLogId(logId); // store the log ID in state
+      }
+
+      // Step 2: Construct the meal object
+      const meal = {
+        mealType: currentRecipe.mealType || "lunch",
+        source: currentRecipe.source || "home-cooked",
+        meal_id: new Date().getTime().toString(),
+        mealName: currentRecipe.recipeName,
+        totalCalories: currentRecipe.totalCalories,
+        proteinGrams: currentRecipe.proteinGrams,
+        carbGrams: currentRecipe.carbGrams,
+        fatGrams: currentRecipe.fatGrams,
+      };
+
+      // Step 3: Add meal to the log
+      const resAdd = await fetch("https://squire-app.onrender.com/meals/add-meal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mealLog_id: logId, meal }),
+      });
+
+      const updatedLog = await resAdd.json();
+      console.log("✅ Meal added:", updatedLog);
+
+    } catch (err) {
+      console.error("❌ Error logging meal:", err);
+    }
+  }
+
+  // async function updateDailyMacrosOnBackend(updatedMacros) {
+  //   try {
+  //     const response = await fetch('https://squire-app.onrender.com/users/update-macros', {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({
+  //         userId, // your logged-in user
+  //         ...updatedMacros
+  //       }),
+  //     });
+
+  //     if (!response.ok) throw new Error('Failed to update macros');
+
+  //     const data = await response.json();
+  //     console.log('✅ Updated macros on backend:', data);
+
+  //   } catch (error) {
+  //     console.error('❌ Error updating macros:', error);
+  //   }
+  // }
+
 
 
 
@@ -210,10 +401,14 @@ export default function Home() {
               <SearchResult text={resultText} />
               <button
                 className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-                onClick={addRecipeToDailyIntake}
+                onClick={async () => {
+                  await addRecipeToDailyIntake(); // update macros
+                  logMeal(); // log meal separately
+                }}
               >
                 Add to Daily Intake
               </button>
+
             </div>
           )}
 
@@ -237,11 +432,13 @@ export default function Home() {
             title="Profile"
             onClick={() => console.log('Profile clicked!')}
           />
-          <BoxButton
-            imageSrc="/images/icon2.png"
-            title="Messages"
-            onClick={() => console.log('Messages clicked!')}
-          />
+          <Link href="/knot-integration">
+            <BoxButton
+              imageSrc="https://www.knotapi.com/static/images/favicons/apple-touch-icon.png"
+              title="Sync merchant Data"
+              onClick={() => console.log('Messages clicked!')}
+            />
+          </Link>
           <BoxButton
             imageSrc="/images/icon3.png"
             title="Settings"

@@ -15,12 +15,13 @@ export default function ImageBoxButton({ imageSrc, title, onClick }) {
       "
     >
       <div className="w-20 h-20 relative mb-3">
-        <Image
+        {/* <Image
           src={imageSrc}
           alt={title}
           fill
           className="object-contain"
-        />
+        /> */}
+        <img src={imageSrc} alt={title} className="object-contain w-full h-full" />
       </div>
       <span className="text-lg font-semibold text-gray-700">{title}</span>
     </button>

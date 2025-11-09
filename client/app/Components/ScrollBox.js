@@ -6,7 +6,7 @@ export default function ScrollBox(props) {
     const [mealLogs, setMealLogs] = useState([]);
 
     useEffect(() => {
-        const payload = { "userId": "690fc7733d3f4948a7d89600" }
+        const payload = { "userId": "690fc7733d3f4948a7d89600", count: 20 }
 
         // fetch('https://squire-app.onrender.com/api/suggest-meal')
         //   .then((res) => {
